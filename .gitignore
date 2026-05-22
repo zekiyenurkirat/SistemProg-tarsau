@@ -1,0 +1,26 @@
+# Derleme ciktilari
+obj/
+bin/
+*.o
+*.a
+tarsau
+
+# Test ve gecici arsivler
+tests/out/
+a.sau
+*.sau
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# Paketleme
+*.zip
+*.rar
+*.pdf
+
+# OS
+.DS_Store
+Thumbs.db
