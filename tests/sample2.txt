@@ -1,0 +1,2 @@
+Ikinci test dosyasi.
+ASCII metin icerigi: 12345 ABCDE.

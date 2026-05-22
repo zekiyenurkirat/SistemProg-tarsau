@@ -1,0 +1,3 @@
+Merhaba Dunya!
+Bu bir ornek metin dosyasidir.
+Sistem Programlama - tarsau testi.
