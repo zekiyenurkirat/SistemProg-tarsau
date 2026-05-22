@@ -1,0 +1,28 @@
+=== tarsau derleme ===
+$ make clean && make
+Derleme tamamlandi: bin/tarsau
+
+=== tarsau testleri ===
+$ make test
+=== tarsau testleri basliyor ===
+tarsau: 2 dosya basariyla arsivlendi -> .../tests/out/test.sau
+tarsau: 2 dosya basariyla cikarildi -> .../tests/out/extracted
+[OK] Arsivleme ve cikarma
+tarsau: 1 dosya basariyla arsivlendi -> a.sau
+[OK] Varsayilan a.sau
+tarsau hata: Uyumsuz dosya formati (yalnizca metin): .../binary.dat
+[OK] Binary dosya reddedildi
+tarsau hata: Cikti dosyasi .sau uzantili olmalidir: .../out.zip
+[OK] .sau uzanti kontrolu
+tarsau hata: Bozuk arsiv (gecersiz 10 bayt baslik).
+[OK] Bozuk arsiv reddedildi
+[OK] Parametre kontrolu
+=== Tum testler basarili ===
+
+=== ornek arsivleme ===
+$ ./bin/tarsau -b tests/sample1.txt tests/sample2.txt -o tests/out/demo.sau
+tarsau: 2 dosya basariyla arsivlendi -> tests/out/demo.sau
+
+=== ornek acma ===
+$ ./bin/tarsau -a tests/out/demo.sau tests/out/extracted
+tarsau: 2 dosya basariyla cikarildi -> tests/out/extracted
