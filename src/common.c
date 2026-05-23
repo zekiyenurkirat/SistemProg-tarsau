@@ -11,6 +11,19 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#if defined(_WIN32) || defined(__MINGW32__)
+#include <direct.h>
+#endif
+
+static int tarsau_mkdir_one(const char *path)
+{
+#if defined(_WIN32) || defined(__MINGW32__)
+    return _mkdir(path);
+#else
+    return mkdir(path, 0755);
+#endif
+}
+
 void tarsau_die(const char *message)
 {
     if (message != NULL) {
@@ -69,6 +82,9 @@ const char *tarsau_basename(const char *path)
     }
 
     slash = strrchr(path, '/');
+    if (slash == NULL) {
+        slash = strrchr(path, '\\');
+    }
     if (slash != NULL) {
         return slash + 1;
     }
@@ -92,7 +108,7 @@ int tarsau_mkdir_p(const char *path)
     memcpy(buf, path, len + 1U);
 
     /* Sonundaki '/' karakterlerini temizle */
-    while (len > 0U && buf[len - 1U] == '/') {
+    while (len > 0U && (buf[len - 1U] == '/' || buf[len - 1U] == '\\')) {
         buf[len - 1U] = '\0';
         len--;
     }
@@ -114,24 +130,35 @@ int tarsau_mkdir_p(const char *path)
 
     /* Goreceli veya mutlak yolda parca parca dizin olustur */
     p = buf;
-    if (buf[0] == '/') {
+    if (buf[0] == '/' || buf[0] == '\\') {
         p++;
     }
+#if defined(_WIN32) || defined(__MINGW32__)
+    if (((buf[0] >= 'A' && buf[0] <= 'Z') ||
+         (buf[0] >= 'a' && buf[0] <= 'z')) &&
+        buf[1] == ':' && buf[2] != '\0') {
+        p = buf + 2;
+        if (*p == '/' || *p == '\\') {
+            p++;
+        }
+    }
+#endif
 
     for (; *p != '\0'; p++) {
-        if (*p == '/') {
+        if (*p == '/' || *p == '\\') {
+            char sep = *p;
             *p = '\0';
             if (buf[0] != '\0' && stat(buf, &st) != 0) {
-                if (mkdir(buf, 0755) != 0 && errno != EEXIST) {
+                if (tarsau_mkdir_one(buf) != 0 && errno != EEXIST) {
                     tarsau_free(buf);
                     return -1;
                 }
             }
-            *p = '/';
+            *p = sep;
         }
     }
 
-    if (mkdir(buf, 0755) != 0 && errno != EEXIST) {
+    if (tarsau_mkdir_one(buf) != 0 && errno != EEXIST) {
         tarsau_free(buf);
         return -1;
     }

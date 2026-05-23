@@ -32,16 +32,17 @@ int tarsau_is_text_file(const char *path)
     while ((n = fread(buffer, 1, sizeof(buffer), fp)) > 0U) {
         for (i = 0; i < n; i++) {
             unsigned char c = buffer[i];
-
-            /* Izin verilen kontrol karakterleri: TAB, LF, CR */
+    
+            /* izin verilen kontrol karakterleri */
             if (c == 0x09 || c == 0x0A || c == 0x0D) {
                 continue;
             }
-            /* Yazdirilabilir ASCII */
-            if (c >= 0x20 && c <= 0x7E) {
+    
+            /* tüm normal byte'ları kabul et */
+            if (c >= 0x20) {
                 continue;
             }
-
+    
             fclose(fp);
             fprintf(stderr,
                     "tarsau hata: Uyumsuz dosya formati (yalnizca metin): %s\n",

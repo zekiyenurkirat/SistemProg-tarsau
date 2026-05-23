@@ -194,11 +194,21 @@ int tarsau_build_archive(const char *const *files, int count,
     /* Dosya iceriklerini sirayla yaz */
     for (i = 0; i < count; i++) {
         if (tarsau_append_file_content(out, files[i]) != 0) {
+            fprintf(stderr, "tarsau hata: Dosya icerigi yazilamadi: %s\n",
+                    files[i]);
             fclose(out);
             remove(archive_path);
             tarsau_free(meta_list);
             return -1;
         }
+    }
+
+    if (fflush(out) != 0) {
+        fprintf(stderr, "tarsau hata: Arsiv tamponu boslatilamadi.\n");
+        fclose(out);
+        remove(archive_path);
+        tarsau_free(meta_list);
+        return -1;
     }
 
     if (fclose(out) != 0) {
@@ -209,5 +219,6 @@ int tarsau_build_archive(const char *const *files, int count,
 
     tarsau_free(meta_list);
     printf("tarsau: %d dosya basariyla arsivlendi -> %s\n", count, archive_path);
+    fflush(stdout);
     return 0;
 }

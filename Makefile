@@ -4,7 +4,8 @@
 # ============================================================================
 
 CC       = gcc
-CFLAGS   = -Wall -Wextra -Wpedantic -std=c11 -O2 -Iinclude -D_POSIX_C_SOURCE=200809L
+CFLAGS   = -Wall -Wextra -Wpedantic -std=c11 -O2 -Iinclude
+CFLAGS  += $(if $(filter Windows_NT,$(OS)),,-D_POSIX_C_SOURCE=200809L)
 LDFLAGS  =
 TARGET   = bin/tarsau
 
@@ -23,9 +24,17 @@ SOURCES  = $(SRC_DIR)/main.c \
 
 OBJECTS  = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SOURCES))
 
-.PHONY: all clean test dirs
+# Tek dosya derleme: gcc -Wall -std=c11 -D_POSIX_C_SOURCE=200809L -o tarsau tarsau.c
+SINGLE   = tarsau.c
+SINGLE_BIN = tarsau
+
+.PHONY: all clean test dirs single
 
 all: dirs $(TARGET)
+
+single:
+	$(CC) $(CFLAGS) -o $(SINGLE_BIN) $(SINGLE)
+	@echo "Tek dosya derleme: ./$(SINGLE_BIN)"
 
 dirs:
 	@mkdir -p $(OBJ_DIR) $(BIN_DIR)

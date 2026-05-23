@@ -23,7 +23,19 @@ SistemProg_Proje/
 └── README.md
 ```
 
-## Derleme (Linux / WSL)
+## Derleme
+
+### Windows (MinGW / PowerShell)
+
+```bat
+build.bat
+REM veya:
+gcc -Wall -std=c11 -o tarsau.exe tarsau.c
+```
+
+**Önemli:** `tarsau` (uzantısız) dosyası WSL/Linux için derlenmiş olabilir; PowerShell’de çalışmaz. Mutlaka **`tarsau.exe`** kullanın.
+
+### Linux / WSL
 
 ```bash
 make          # bin/tarsau oluşturur
@@ -31,14 +43,25 @@ make clean    # obj/ ve bin/ temizler
 make test     # otomatik testleri çalıştırır
 ```
 
+Tek dosya:
+
+```bash
+gcc -Wall -std=c11 -D_POSIX_C_SOURCE=200809L -o tarsau tarsau.c
+```
+
 ## Kullanım
 
 ### Arşiv oluşturma
 
 ```bash
+# Linux
 ./bin/tarsau -b dosya1.txt dosya2.txt -o cikti.sau
-./bin/tarsau -b tek_dosya.txt          # -> a.sau
+
+# Windows (proje klasöründen)
+.\tarsau.exe -b tests\sample1.txt tests\sample2.txt -o yedek.sau
 ```
+
+`yedek.sau` **çalıştırdığınız klasörde** oluşur (`dir yedek.sau` ile kontrol edin).
 
 ### Arşiv açma
 

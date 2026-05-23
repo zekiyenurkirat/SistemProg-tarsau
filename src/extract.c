@@ -13,8 +13,41 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-
 #define TARSAU_MAX_ARCHIVE_FILES 32
+
+static char *tarsau_strtok(char *str, const char *delim, char **saveptr)
+{
+    char *start;
+
+    if (str != NULL) {
+        *saveptr = str;
+    }
+
+    if (*saveptr == NULL) {
+        return NULL;
+    }
+
+    start = *saveptr;
+
+    while (**saveptr) {
+        const char *d = delim;
+
+        while (*d) {
+            if (**saveptr == *d) {
+                **saveptr = '\0';
+                (*saveptr)++;
+                return start;
+            }
+            d++;
+        }
+
+        (*saveptr)++;
+    }
+
+    *saveptr = NULL;
+    return start;
+}
+
 
 /**
  * @brief Metadata satirini parse eder: ad|izin|boyut|hex_onizleme
@@ -23,9 +56,9 @@ static int tarsau_parse_meta_line(const char *line, tarsau_file_meta_t *meta)
 {
     char *work;
     char *token;
-    char *saveptr;
+    char *saveptr = NULL;
     char hex_preview[TARSAU_PREVIEW_BYTES * 2 + 1];
-    unsigned long mode_val;
+    unsigned int mode_val;
     unsigned long size_val;
     int field;
 
@@ -46,7 +79,7 @@ static int tarsau_parse_meta_line(const char *line, tarsau_file_meta_t *meta)
     strcpy(work, line);
 
     field = 0;
-    token = strtok_r(work, "|", &saveptr);
+    token = tarsau_strtok(work, "|", &saveptr);
     memset(meta, 0, sizeof(*meta));
 
     while (token != NULL) {
@@ -55,7 +88,7 @@ static int tarsau_parse_meta_line(const char *line, tarsau_file_meta_t *meta)
             strncpy(meta->name, token, TARSAU_MAX_FILENAME - 1U);
             break;
         case 1:
-            if (sscanf(token, "%lo", &mode_val) != 1) {
+            if (sscanf(token, "%o", &mode_val) != 1) {
                 tarsau_free(work);
                 return -1;
             }
@@ -80,7 +113,7 @@ static int tarsau_parse_meta_line(const char *line, tarsau_file_meta_t *meta)
             break;
         }
         field++;
-        token = strtok_r(NULL, "|", &saveptr);
+        token = tarsau_strtok(NULL, "|", &saveptr);
     }
 
     tarsau_free(work);
